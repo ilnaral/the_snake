@@ -66,7 +66,7 @@ class GameObject:
 
 class Apple(GameObject):
     """Описание дочернего класса яблока."""
-       
+
     def __init__(self):
         super().__init__()
         self.body_color = APPLE_COLOR
@@ -74,14 +74,13 @@ class Apple(GameObject):
 
     def randomize_position(self):
         """Метод, при котором яблоко спавнится в рандомном месте."""
-
         self.position = (
             randint(0, GRID_WIDTH - 1) * GRID_SIZE,
             randint(0, GRID_HEIGHT - 1) * GRID_SIZE
         )
 
     def draw(self):
-        """Метод отрисовки яблока."""        
+        """Метод отрисовки яблока."""
         rect = pg.Rect(self.position, (GRID_SIZE, GRID_SIZE))
         pg.draw.rect(screen, self.body_color, rect)
         pg.draw.rect(screen, BORDER_COLOR, rect, 1)
@@ -106,7 +105,7 @@ class Stone(GameObject):
         """Метод отрисовки камушка."""
         rect = pg.Rect(self.position, (GRID_SIZE, GRID_SIZE))
         pg.draw.rect(screen, self.body_color, rect)
-        pg.draw.rect(screen, BORDER_COLOR, rect, 1)       
+        pg.draw.rect(screen, BORDER_COLOR, rect, 1)
 
 
 class Snake(GameObject):
@@ -119,7 +118,7 @@ class Snake(GameObject):
         self.direction = RIGHT
         self.next_direction = None
         self.body_color = SNAKE_COLOR
-        self.last = None       
+        self.last = None
 
     def update_direction(self):
         """Метод обновления движения змейки."""
@@ -157,9 +156,9 @@ class Snake(GameObject):
     # Удаление последнего сегмента
         if len(self.positions) > self.length:
             self.last = self.positions.pop()
-    
-    """Метод отрисовки змейки."""
+
     def draw(self):
+        """Метод отрисовки змейки."""
         for position in self.positions[0:]:
             rect = (pg.Rect(position, (GRID_SIZE, GRID_SIZE)))
             pg.draw.rect(screen, self.body_color, rect)
@@ -175,18 +174,19 @@ class Snake(GameObject):
             last_rect = pg.Rect(self.last, (GRID_SIZE, GRID_SIZE))
             pg.draw.rect(screen, BOARD_BACKGROUND_COLOR, last_rect)
 
-    """Метод возвращения текущей позиции головы змейки."""
     def get_head_position(self):
+        """Метод возвращения текущей позиции головы змейки."""
         return self.positions[0]
 
-    """Метод сбрасывания игры при столкновении."""
     def reset(self) -> None:
+        """Метод сбрасывания игры при столкновении."""
         print('GAME OVER!')
         # Сбрасываем змейку при проигрыше
         self. length = 1
         self.positions = [(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)]
         self.direction = RIGHT
         self.next_direction = None
+
 
 def handle_keys(game_object):
     """Метод управления змейкой при помощи клавиш."""
@@ -203,6 +203,7 @@ def handle_keys(game_object):
                 game_object.next_direction = LEFT
             elif event.key == pg.K_RIGHT and game_object.direction != LEFT:
                 game_object.next_direction = RIGHT
+
 
 def main():
     """Метод инициализации pg."""
@@ -223,9 +224,11 @@ def main():
             apple.randomize_position()
             stone.randomize_position()
             score += 1
-        if snake.get_head_position() in snake.positions[1:] or snake.get_head_position() == stone.position:
+        if snake.get_head_position() in \
+           snake.positions[1:] or \
+           snake.get_head_position() == stone.position:
             snake.reset()
-            score = 0           
+            score = 0
         screen.fill(BOARD_BACKGROUND_COLOR)
         apple.draw()
         snake.draw()
