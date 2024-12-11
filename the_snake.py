@@ -140,7 +140,7 @@ class Snake(GameObject):
         """Метод обновления движения змейки."""
         if self.next_direction is not None:
             if (self.direction[0] + self.next_direction[0] != 0 or
-                self.direction[1] + self.next_direction[1] != 0):
+                    self.direction[1] + self.next_direction[1] != 0):
                 self.direction = self.next_direction
 
     def move(self, stone):
@@ -167,14 +167,14 @@ class Snake(GameObject):
             self.last = self.positions.pop()
         else:
             self.last = None
-        
-        return True        
+
+        return True
 
     def draw(self):
         """Метод отрисовки змейки."""
         for position in self.positions:
             self.draw_cell(position)
-    
+
     # Отрисовка головы
         head_rect = pg.Rect(self.positions[0], (GRID_SIZE, GRID_SIZE))
         pg.draw.rect(screen, SNAKE_COLOR, head_rect)
@@ -192,7 +192,7 @@ class Snake(GameObject):
     def reset(self) -> None:
         """Метод сбрасывания игры при столкновении."""
         print('GAME OVER!')
-        
+
         # Сбрасываем змейку при проигрыше
         self.length = 1
         self.positions = [(SCREEN_WIDTH // 2 // GRID_SIZE * GRID_SIZE,
