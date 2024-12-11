@@ -139,8 +139,8 @@ class Snake(GameObject):
     def update_direction(self):
         """Метод обновления движения змейки."""
         if self.next_direction is not None:
-            if (self.direction[0] + self.next_direction[0] != 0 or
-                    self.direction[1] + self.next_direction[1] != 0):
+            if (self.direction[0] + self.next_direction[0] != 0
+                    or self.direction[1] + self.next_direction[1] != 0):
                 self.direction = self.next_direction
 
     def move(self, stone):
