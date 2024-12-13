@@ -60,6 +60,7 @@ class GameObject:
         self.body_color = BOARD_BACKGROUND_COLOR
 
     def draw(self):
+        """Метод отрисовки, определим в дочерних классах."""
         pass
 
     def draw_cell(self, position: tuple[int], color: tuple[int]) -> None:
