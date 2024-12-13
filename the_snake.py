@@ -59,6 +59,9 @@ class GameObject:
         self.position = [(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)]
         self.body_color = BOARD_BACKGROUND_COLOR
 
+    def draw(self):
+        pass
+
     def draw_cell(self, position: tuple[int], color: tuple[int]) -> None:
         """Метод отрисовки, особенности которых будут прописаны
         в дочерних классах.
