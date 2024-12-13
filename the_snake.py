@@ -59,10 +59,12 @@ class GameObject:
         self.position = [(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)]
         self.body_color = BOARD_BACKGROUND_COLOR
 
-    def draw(self) -> None:
-        """Метод отрисовки, который будет назначен в дочерних классах."""
-        rect = pg.Rect(self.position[0], (GRID_SIZE, GRID_SIZE))
-        pg.draw.rect(screen, self.body_color, rect)
+    def draw_cell(self, position: tuple[int], color: tuple[int]) -> None:
+        """Метод отрисовки, особенности которых будут прописаны
+        в дочерних классах.
+        """
+        rect = pg.Rect(position, (GRID_SIZE, GRID_SIZE))
+        pg.draw.rect(screen, color, rect)
         pg.draw.rect(screen, BORDER_COLOR, rect, 1)
 
 
@@ -89,13 +91,7 @@ class Apple(GameObject):
 
     def draw(self):
         """Метод отрисовки яблока."""
-        self.draw_cell(self.position)
-
-    def draw_cell(self, position):
-        """Метод отрисовки ячейки с яблоком."""
-        rect = pg.Rect(position, (GRID_SIZE, GRID_SIZE))
-        pg.draw.rect(screen, APPLE_COLOR, rect)
-        pg.draw.rect(screen, BORDER_COLOR, rect, 1)
+        self.draw_cell(self.position, APPLE_COLOR)
 
 
 class Stone(GameObject):
@@ -119,13 +115,7 @@ class Stone(GameObject):
 
     def draw(self):
         """Метод отрисовки камушка."""
-        self.draw_cell(self.position)
-
-    def draw_cell(self, position):
-        """Метод отрисовки ячейки с камушком."""
-        rect = pg.Rect(position, (GRID_SIZE, GRID_SIZE))
-        pg.draw.rect(screen, STONE_COLOR, rect)
-        pg.draw.rect(screen, BORDER_COLOR, rect, 1)
+        self.draw_cell(self.position, STONE_COLOR)
 
 
 class Snake(GameObject):
@@ -136,12 +126,11 @@ class Snake(GameObject):
         super().__init__()
         self.reset()
 
-    def update_direction(self):
+    def update_direction(self, new_direction):
         """Метод обновления движения змейки."""
-        if self.next_direction is not None:
-            if (self.direction[0] + self.next_direction[0] != 0
-                    or self.direction[1] + self.next_direction[1] != 0):
-                self.direction = self.next_direction
+        if (self.direction[0] + new_direction[0] != 0 or 
+                self.direction[1] + new_direction[1] != 0):
+            self.direction = new_direction
 
     def move(self, stone):
         """Метод движения змейки."""
@@ -156,10 +145,6 @@ class Snake(GameObject):
 
         new_head = (head_x, head_y)
 
-        # Проверка на столкновение с телом змейки или камнем
-        if new_head in self.positions[1:] or new_head == stone.position:
-            return False
-
         # Добавление головы змейки в начало списка
         self.positions.insert(0, new_head)
 
@@ -173,7 +158,7 @@ class Snake(GameObject):
     def draw(self):
         """Метод отрисовки змейки."""
         for position in self.positions:
-            self.draw_cell(position)
+            self.draw_cell(position, SNAKE_COLOR)
 
     # Отрисовка головы
         head_rect = pg.Rect(self.positions[0], (GRID_SIZE, GRID_SIZE))
@@ -191,7 +176,7 @@ class Snake(GameObject):
 
     def reset(self) -> None:
         """Метод сбрасывания игры при столкновении."""
-        print('GAME OVER!')
+        print("GAME OVER!")
 
         # Сбрасываем змейку при проигрыше
         self.length = 1
@@ -201,12 +186,6 @@ class Snake(GameObject):
         # Инициализация направления и следующего направления
         self.direction = RIGHT
         self.next_direction = None
-
-    def draw_cell(self, position):
-        """Метод отрисовки тела змейки."""
-        rect = pg.Rect(position, (GRID_SIZE, GRID_SIZE))
-        pg.draw.rect(screen, SNAKE_COLOR, rect)
-        pg.draw.rect(screen, BORDER_COLOR, rect, 1)
 
 
 def handle_keys(snake):
@@ -218,7 +197,7 @@ def handle_keys(snake):
         if event.type == pg.KEYDOWN:
             new_direction = some_dict.get(
                 (event.key, snake.direction), snake.direction)
-            snake.next_direction = new_direction
+            snake.update_direction(new_direction)
 
 
 def main():
@@ -233,20 +212,20 @@ def main():
     while True:
         clock.tick(SPEED)
         handle_keys(snake)
-        snake.update_direction()
         if not snake.move(stone):
             snake.reset()
             score = 0
-        elif snake.get_head_position() == apple.position:
+        if snake.get_head_position() in snake.positions[1:]:
+            snake.reset()
+            score = 0
+        if snake.get_head_position() == apple.position:
             snake.length += 1
             apple.randomize_position(snake.positions)
             stone.randomize_position(snake.positions)
             score += 1
-            new_head = (
-                snake.get_head_position()[0] + snake.direction[0] * GRID_SIZE,
-                snake.get_head_position()[1] + snake.direction[1] * GRID_SIZE
-            )
-            snake.positions.insert(0, new_head)
+        elif snake.get_head_position() == stone.position:
+            snake.reset()
+            score = 0
         screen.fill(BOARD_BACKGROUND_COLOR)
         apple.draw()
         snake.draw()
