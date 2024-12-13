@@ -128,8 +128,8 @@ class Snake(GameObject):
 
     def update_direction(self, new_direction):
         """Метод обновления движения змейки."""
-        if (self.direction[0] + new_direction[0] != 0 or 
-                self.direction[1] + new_direction[1] != 0):
+        if (self.direction[0] + new_direction[0] != 0 
+                or self.direction[1] + new_direction[1] != 0):
             self.direction = new_direction
 
     def move(self, stone):
