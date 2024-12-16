@@ -71,6 +71,11 @@ class GameObject:
         pg.draw.rect(screen, color, rect)
         pg.draw.rect(screen, BORDER_COLOR, rect, 1)
 
+    def free_cell(self, position: tuple[int]) -> None:
+        """Метод для затирания ячейки."""
+        for position in self.positions:
+            self.draw_cell(position, SNAKE_COLOR)
+
 
 class Apple(GameObject):
     """Описание дочернего класса яблока."""
@@ -132,11 +137,9 @@ class Snake(GameObject):
 
     def update_direction(self, new_direction):
         """Метод обновления движения змейки."""
-        if (self.direction[0] + new_direction[0] != 0
-                or self.direction[1] + new_direction[1] != 0):
-            self.direction = new_direction
+        self.direction = new_direction
 
-    def move(self, stone):
+    def move(self):
         """Метод движения змейки."""
         head_x, head_y = self.get_head_position()
         value_x, value_y = self.direction
@@ -161,18 +164,11 @@ class Snake(GameObject):
 
     def draw(self):
         """Метод отрисовки змейки."""
-        for position in self.positions:
-            self.draw_cell(position, SNAKE_COLOR)
-
-    # Отрисовка головы
-        head_rect = pg.Rect(self.positions[0], (GRID_SIZE, GRID_SIZE))
-        pg.draw.rect(screen, SNAKE_COLOR, head_rect)
-        pg.draw.rect(screen, BORDER_COLOR, head_rect, 1)
-
-    # Затирание последнего сегмента
+        # Отрисовка головы змейки
+        self.draw_cell(self.positions[0], SNAKE_COLOR)
+        # Затирание последнего сегмента
         if self.last:
-            last_rect = pg.Rect(self.last, (GRID_SIZE, GRID_SIZE))
-            pg.draw.rect(screen, BOARD_BACKGROUND_COLOR, last_rect)
+            self.free_cell(self.last)
 
     def get_head_position(self):
         """Метод возвращения текущей позиции головы змейки."""
@@ -197,7 +193,7 @@ def handle_keys(snake):
     for event in pg.event.get():
         if event.type == pg.QUIT:
             pg.quit()
-            raise SystemExit("Game Over")
+            raise SystemExit("GAME OVER!")
         if event.type == pg.KEYDOWN:
             new_direction = some_dict.get(
                 (event.key, snake.direction), snake.direction)
@@ -216,13 +212,11 @@ def main():
     while True:
         clock.tick(SPEED)
         handle_keys(snake)
-        if not snake.move(stone):
-            snake.reset()
-            score = 0
+        snake.move()
         if snake.get_head_position() in snake.positions[1:]:
             snake.reset()
             score = 0
-        if snake.get_head_position() == apple.position:
+        elif snake.get_head_position() == apple.position:
             snake.length += 1
             apple.randomize_position(snake.positions)
             stone.randomize_position(snake.positions)
