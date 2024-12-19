@@ -28,6 +28,8 @@ SNAKE_COLOR = (0, 255, 0)
 
 STONE_COLOR = (128, 128, 128)
 
+COLOR = (0, 0, 0)
+
 SPEED = 10
 
 some_dict = {
@@ -43,12 +45,7 @@ some_dict = {
 
 screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 32)
 
-pg.display.set_caption('Змейка')
-
 clock = pg.time.Clock()
-
-pg.font.init()
-font = pg.font.Font(None, 30)
 
 
 class GameObject:
@@ -73,8 +70,10 @@ class GameObject:
 
     def free_cell(self, position: tuple[int]) -> None:
         """Метод для затирания ячейки."""
-        for position in self.positions:
-            self.draw_cell(position, SNAKE_COLOR)
+        pg.draw.rect(
+            screen, BOARD_BACKGROUND_COLOR,
+            pg.Rect(position, (GRID_SIZE, GRID_SIZE))
+        )
 
 
 class Apple(GameObject):
@@ -164,7 +163,6 @@ class Snake(GameObject):
 
     def draw(self):
         """Метод отрисовки змейки."""
-        # Отрисовка головы змейки
         self.draw_cell(self.positions[0], SNAKE_COLOR)
         # Затирание последнего сегмента
         if self.last:
@@ -215,21 +213,28 @@ def main():
         snake.move()
         if snake.get_head_position() in snake.positions[1:]:
             snake.reset()
+            stone.free_cell(stone.position)
+            screen.fill(BOARD_BACKGROUND_COLOR)
             score = 0
         elif snake.get_head_position() == apple.position:
             snake.length += 1
             apple.randomize_position(snake.positions)
+            stone.free_cell(stone.position)
             stone.randomize_position(snake.positions)
             score += 1
         elif snake.get_head_position() == stone.position:
+            stone.free_cell(stone.position)
             snake.reset()
+            screen.fill(BOARD_BACKGROUND_COLOR)
             score = 0
-        screen.fill(BOARD_BACKGROUND_COLOR)
         apple.draw()
         snake.draw()
         stone.draw()
-        score_text = font.render(f"SCORE: {score}", True, (180, 180, 180))
-        screen.blit(score_text, (10, 10))
+        score = snake.length
+        pg.display.set_caption(
+            "Змейка. "
+            f"Длина змейки: {score}"
+        )
         pg.display.update()
 
 
